@@ -24,10 +24,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GameHelper\GameHelper.csproj">
-      <Private>false</Private>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-    </ProjectReference>
+    <Reference Include="Coroutine">
+      <HintPath>D:\GH\gamehelper2\GameHelper\bin\Release\net10.0-windows\win-x64\Coroutine.dll</HintPath>
+    </Reference>
+    <Reference Include="GameHelper">
+      <HintPath>D:\GH\gamehelper2\GameHelper\bin\Release\net10.0-windows\win-x64\GameHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="GameOffsets">
+      <HintPath>D:\GH\gamehelper2\GameHelper\bin\Release\net10.0-windows\win-x64\GameOffsets.dll</HintPath>
+    </Reference>
+    <Reference Include="ImGui.NET">
+      <HintPath>D:\GH\gamehelper2\GameHelper\bin\Release\net10.0-windows\win-x64\ImGui.NET.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <Target Name="CopyFiles" AfterTargets="Build">

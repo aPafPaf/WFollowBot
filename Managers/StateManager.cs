@@ -34,7 +34,7 @@ public class StateManager
     public event Action<ActionState> OnStateChanged;
 
     private bool _hasStateChanged;
-    private double _nextFlashUseTime;
+    private double _nextFlaskUseTime;
     public bool HasStateChanged
     {
         get
@@ -98,30 +98,30 @@ public class StateManager
             return;
         }
 
-        if (settings.FlashUseEnabled)
+        if (settings.FlaskUseEnabled)
         {
             var entity = playerInfo.GetEntity();
             if (entity != null && entity.IsValid && entity.TryGetComponent(out Life life))
             {
                 double now = Environment.TickCount64;
-                if (now >= _nextFlashUseTime)
+                if (now >= _nextFlaskUseTime)
                 {
-                    bool needFlash = false;
+                    bool needFlask = false;
                     if (life.Health.Total > 0)
                     {
                         float hpPct = (float)life.Health.Current / life.Health.Total * 100f;
-                        if (hpPct < settings.FlashHpThreshold)
-                            needFlash = true;
+                        if (hpPct < settings.FlaskHpThreshold)
+                            needFlask = true;
                     }
-                    if (!needFlash && life.Mana.Total > 0)
+                    if (!needFlask && life.Mana.Total > 0)
                     {
                         float manaPct = (float)life.Mana.Current / life.Mana.Total * 100f;
-                        if (manaPct < settings.FlashManaThreshold)
-                            needFlash = true;
+                        if (manaPct < settings.FlaskManaThreshold)
+                            needFlask = true;
                     }
-                    if (needFlash)
+                    if (needFlask)
                     {
-                        _nextFlashUseTime = now + settings.FlashCooldownMs;
+                        _nextFlaskUseTime = now + settings.FlaskCooldownMs;
                         SetState(ActionState.FlaskUse);
                         return;
                     }

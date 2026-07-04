@@ -185,10 +185,10 @@ namespace WFollowBot
 
                 if (ImGui.TreeNode("Flask"))
                 {
-                    ImGui.Checkbox("Enable Auto Flask", ref cfg.FlashUseEnabled);
-                    ImGui.SliderInt("HP Threshold %", ref cfg.FlashHpThreshold, 1, 99);
-                    ImGui.SliderInt("Mana Threshold %", ref cfg.FlashManaThreshold, 1, 99);
-                    ImGui.SliderInt("Cooldown (ms)", ref cfg.FlashCooldownMs, 500, 5000);
+                    ImGui.Checkbox("Enable Auto Flask", ref cfg.FlaskUseEnabled);
+                    ImGui.SliderInt("HP Threshold %", ref cfg.FlaskHpThreshold, 1, 99);
+                    ImGui.SliderInt("Mana Threshold %", ref cfg.FlaskManaThreshold, 1, 99);
+                    ImGui.SliderInt("Cooldown (ms)", ref cfg.FlaskCooldownMs, 500, 5000);
                     ImGui.TreePop();
                 }
 

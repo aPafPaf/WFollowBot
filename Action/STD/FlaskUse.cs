@@ -4,7 +4,7 @@ using WFollowBot.Managers;
 
 namespace WFollowBot.Action.STD;
 
-public class FlashUse : IAction
+public class FlaskUse : IAction
 {
     public string SkillSetName => "STD";
     public ActionState State => ActionState.FlaskUse;
@@ -12,7 +12,7 @@ public class FlashUse : IAction
     public void Execute(PlayerContext context)
     {
         var settings = context.CurrentSettings;
-        if (settings == null || !settings.FlashUseEnabled)
+        if (settings == null || !settings.FlaskUseEnabled)
             return;
 
         var entity = context.PlayerInfo.GetEntity();
@@ -25,7 +25,7 @@ public class FlashUse : IAction
         if (life.Health.Total > 0)
         {
             float hpPercent = (float)life.Health.Current / life.Health.Total * 100f;
-            if (hpPercent < settings.FlashHpThreshold)
+            if (hpPercent < settings.FlaskHpThreshold)
             {
                 context.JoyStick.PressButton(Xbox360Button.Left, true);
                 return;
@@ -35,7 +35,7 @@ public class FlashUse : IAction
         if (life.Mana.Total > 0)
         {
             float manaPercent = (float)life.Mana.Current / life.Mana.Total * 100f;
-            if (manaPercent < settings.FlashManaThreshold)
+            if (manaPercent < settings.FlaskManaThreshold)
             {
                 context.JoyStick.PressButton(Xbox360Button.Right, true);
             }

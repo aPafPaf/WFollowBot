@@ -53,8 +53,8 @@ public class FollowerSettings
     public CombatStyle Style = CombatStyle.Default;
     public Xbox360Button AttackButton = Xbox360Button.RightShoulder;
 
-    public bool FlashUseEnabled = false;
-    public int FlashHpThreshold = 50;
-    public int FlashManaThreshold = 30;
-    public int FlashCooldownMs = 3000;
+    public bool FlaskUseEnabled = false;
+    public int FlaskHpThreshold = 50;
+    public int FlaskManaThreshold = 30;
+    public int FlaskCooldownMs = 3000;
 }
