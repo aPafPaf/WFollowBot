@@ -225,26 +225,6 @@ public class StateManager
 
     private static bool HasLootNearby(Vector2 playerPos, float radius)
     {
-        var areaInstance = GameHelper.Core.States.InGameStateObject.CurrentAreaInstance;
-        if (areaInstance == null) return false;
-
-        var awakeEntities = areaInstance.AwakeEntities;
-        float radiusSq = radius * radius;
-
-        foreach (var kvp in awakeEntities)
-        {
-            var e = kvp.Value;
-            if (!e.IsValid) continue;
-            if (!e.Path.StartsWith("Metadata/Items/")) continue;
-
-            if (e.TryGetComponent(out Render render))
-            {
-                float dx = render.GridPosition.X - playerPos.X;
-                float dy = render.GridPosition.Y - playerPos.Y;
-                if (dx * dx + dy * dy <= radiusSq)
-                    return true;
-            }
-        }
         return false;
     }
 
