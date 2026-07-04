@@ -15,6 +15,9 @@ public class FlaskUse : IAction
         if (settings == null || !settings.FlaskUseEnabled)
             return;
 
+        if (settings.SpamFlaskUseEnabled)
+            return;
+
         var entity = context.PlayerInfo.GetEntity();
         if (entity == null || !entity.IsValid)
             return;
@@ -22,13 +25,30 @@ public class FlaskUse : IAction
         if (!entity.TryGetComponent(out Life life))
             return;
 
-        if (life.Health.Total > 0)
+        if (context.CurrentSettings.EsFlaskUseEnabled)
         {
-            float hpPercent = (float)life.Health.Current / life.Health.Total * 100f;
-            if (hpPercent < settings.FlaskHpThreshold)
+
+            if (life.Health.Total > 0)
             {
-                context.JoyStick.PressButton(Xbox360Button.Left, true);
-                return;
+                float hpPercent = (float)life.Health.Current / life.Health.Total * 100f;
+                if (hpPercent < settings.FlaskHpThreshold)
+                {
+                    context.JoyStick.PressButtonFor(Xbox360Button.Left, 0.1f, 0.1f, "FlaskUse.HP");
+                    return;
+                }
+            }
+
+        }
+        else
+        {
+            if (life.EnergyShield.Total > 0)
+            {
+                float hpPercent = (float)life.Health.Current / life.Health.Total * 100f;
+                if (hpPercent < settings.FlaskHpThreshold)
+                {
+                    context.JoyStick.PressButtonFor(Xbox360Button.Left, 0.1f, 0.1f, "FlaskUse.HP");
+                    return;
+                }
             }
         }
 
@@ -37,7 +57,7 @@ public class FlaskUse : IAction
             float manaPercent = (float)life.Mana.Current / life.Mana.Total * 100f;
             if (manaPercent < settings.FlaskManaThreshold)
             {
-                context.JoyStick.PressButton(Xbox360Button.Right, true);
+                context.JoyStick.PressButtonFor(Xbox360Button.Right, 0.1f, 0.1f, "FlaskUse.MP");
             }
         }
     }

@@ -16,7 +16,7 @@ public class SmallMoving : IAction
         }
 
         var playerPos = context.PlayerInfo.PlayerGridPosition;
-        var nextPoint = MovementHelper.GetNextWaypoint(path, playerPos);
+        var nextPoint = MovementHelper.GetLookaheadPoint(path, playerPos);
         var finalPoint = path[^1];
 
         context.MovementController.MoveToward(playerPos, nextPoint, finalPoint);

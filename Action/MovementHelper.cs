@@ -7,6 +7,7 @@ namespace WFollowBot.Action;
 
 internal static class MovementHelper
 {
+    public const float DefaultLookaheadRadius = 5f;
 
     public static Point? GetNextWaypointDirect(IReadOnlyList<Point> path, Point playerPos)
     {
@@ -27,8 +28,16 @@ internal static class MovementHelper
         return null;
     }
 
-    public static Point GetNextWaypoint(IReadOnlyList<Point> path, Point playerPos)
+    public static Point GetLookaheadPoint(
+        IReadOnlyList<Point> path,
+        Point playerPos,
+        float radius = DefaultLookaheadRadius)
     {
+        if (path.Count == 0) return playerPos;
+        if (path.Count == 1) return path[0];
+
+        var grid = TerrainInfo.ProcessedTerrainData;
+
         int closestIdx = 0;
         float closestDistSq = float.MaxValue;
         for (int i = 0; i < path.Count; i++)
@@ -41,13 +50,18 @@ internal static class MovementHelper
             }
         }
 
+        float radiusSq = radius * radius;
+        int resultIdx = closestIdx;
         for (int i = closestIdx + 1; i < path.Count; i++)
         {
-            if (DistanceSquared(playerPos, path[i]) > 3 * 3)
+            if (!RegenManager.IsValidDirectly(grid, playerPos, path[i]))
+                break;
+            if (DistanceSquared(playerPos, path[i]) >= radiusSq)
                 return path[i];
+            resultIdx = i;
         }
 
-        return path[^1];
+        return path[resultIdx];
     }
 
     public static float DistanceSquared(Point a, Point b)

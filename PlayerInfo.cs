@@ -83,8 +83,11 @@ public class PlayerInfo
 
     public bool IsDead()
     {
+
         if (Entity == null || !Entity.IsValid) return false;
         if (!Entity.TryGetComponent(out GameHelper.RemoteObjects.Components.Life life)) return false;
+        if(life.Health.Total == 0) return false; // broken offsets
+
         return !life.IsAlive;
     }
 }

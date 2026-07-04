@@ -1,9 +1,10 @@
-﻿using GameHelper.RemoteEnums.Entity;
+﻿using GameHelper;
 using GameHelper.RemoteObjects.Components;
 using System;
-using System.Drawing;
 using System.Numerics;
+using WFollowBot.Action;
 using WFollowBot.Controllers;
+using WFollowBot.Data;
 using WFollowBot.Leader;
 using WFollowBot.PathFinding;
 
@@ -25,16 +26,19 @@ public enum ActionState
     Attack,
     Dodge,
     FlaskUse,
+    SpamFlaskUse,
 }
 
 public class StateManager
 {
+    private const float TransitionActivationRadius = 25f;
+
     private ActionState _currentState;
 
     public event Action<ActionState> OnStateChanged;
 
     private bool _hasStateChanged;
-    private double _nextFlaskUseTime;
+    private double _nextFlashUseTime;
     public bool HasStateChanged
     {
         get
@@ -82,7 +86,10 @@ public class StateManager
         PlayerInfo playerInfo,
         ILeader leader,
         FollowController follow,
-        Settings.FollowerSettings settings)
+        Settings.FollowerSettings settings,
+        EntityGridManager entityGridManager,
+        ActionProvider actionProvider,
+        PlayerContext playerContext)
     {
         if (_stateIsLock)
         {
@@ -100,28 +107,38 @@ public class StateManager
 
         if (settings.FlaskUseEnabled)
         {
+            if (settings.SpamFlaskUseEnabled && AllowSpamLifeFlask())
+            {
+                if (actionProvider.TryExecute(ActionState.SpamFlaskUse, playerContext))
+                {
+                }
+
+                //SetState(ActionState.SpamFlaskUse);
+                return;
+            }
+
             var entity = playerInfo.GetEntity();
             if (entity != null && entity.IsValid && entity.TryGetComponent(out Life life))
             {
                 double now = Environment.TickCount64;
-                if (now >= _nextFlaskUseTime)
+                if (now >= _nextFlashUseTime)
                 {
-                    bool needFlask = false;
+                    bool needFlash = false;
                     if (life.Health.Total > 0)
                     {
                         float hpPct = (float)life.Health.Current / life.Health.Total * 100f;
                         if (hpPct < settings.FlaskHpThreshold)
-                            needFlask = true;
+                            needFlash = true;
                     }
-                    if (!needFlask && life.Mana.Total > 0)
+                    if (!needFlash && life.Mana.Total > 0)
                     {
                         float manaPct = (float)life.Mana.Current / life.Mana.Total * 100f;
                         if (manaPct < settings.FlaskManaThreshold)
-                            needFlask = true;
+                            needFlash = true;
                     }
-                    if (needFlask)
+                    if (needFlash)
                     {
-                        _nextFlaskUseTime = now + settings.FlaskCooldownMs;
+                        _nextFlashUseTime = now + settings.FlaskCooldownMs;
                         SetState(ActionState.FlaskUse);
                         return;
                     }
@@ -133,18 +150,10 @@ public class StateManager
         var playerVec = new Vector2(playerPos.X, playerPos.Y);
 
         bool leaderGone = leader == null || !leader.IsValid;
-        if (leaderGone)
+        if (leaderGone && HasTransitionNearby(playerVec, TransitionActivationRadius))
         {
-            Vector2 searchPoint;
-            if (follow != null && follow.LastLeaderPosition != Point.Empty)
-                searchPoint = new Vector2(follow.LastLeaderPosition.X, follow.LastLeaderPosition.Y);
-            else
-                searchPoint = playerVec;
-            if (HasTransitionNearby(searchPoint, 25f))
-            {
-                SetState(ActionState.InteractingAreaTransition);
-                return;
-            }
+            SetState(ActionState.InteractingAreaTransition);
+            return;
         }
 
         var status = pathfinding.Status;
@@ -156,7 +165,7 @@ public class StateManager
         {
             SetState(ActionState.SmallMoving);
         }
-        else if (settings.AttackEnabled && HasHostileEnemiesNearby(playerVec, settings.CombatRange))
+        else if (settings.AttackEnabled && entityGridManager.GetNearbyEntitiesCount(playerVec, settings.CombatRange) > 0)
         {
             SetState(ActionState.Combat);
             return;
@@ -172,29 +181,24 @@ public class StateManager
         }
     }
 
-    private static bool HasHostileEnemiesNearby(Vector2 playerPos, float radius)
+    private static bool AllowSpamLifeFlask()
     {
-        var areaInstance = GameHelper.Core.States.InGameStateObject.CurrentAreaInstance;
-        if (areaInstance == null) return false;
+        if (Core.States.InGameStateObject.CurrentWorldInstance.AreaDetails.IsHideout)
+            return false;
 
-        var awakeEntities = areaInstance.AwakeEntities;
-        float radiusSq = radius * radius;
+        var flaskInventory = Core.States.InGameStateObject.CurrentAreaInstance.ServerDataObject.FlaskInventory;
 
-        foreach (var kvp in awakeEntities)
+        foreach (var flaskItem in flaskInventory.Items)
         {
-            var e = kvp.Value;
-            if (!e.IsValid || e.EntityType != EntityTypes.Monster) continue;
-            if (!e.TryGetComponent(out Life life) || !life.IsAlive) continue;
-            if (e.TryGetComponent(out NPC npc)) continue;
+            if (!flaskItem.Value.Path.Contains("Life"))
+                continue;
 
-            if (e.TryGetComponent(out Render render))
-            {
-                float dx = render.GridPosition.X - playerPos.X;
-                float dy = render.GridPosition.Y - playerPos.Y;
-                if (dx * dx + dy * dy <= radiusSq)
-                    return true;
-            }
+            if (!flaskItem.Value.TryGetComponent(out Charges charges))
+                continue;
+
+            return charges.Current > charges.PerUseCharge;
         }
+
         return false;
     }
 
@@ -210,7 +214,8 @@ public class StateManager
         {
             var e = kvp.Value;
             if (!e.IsValid) continue;
-            if (!e.TryGetComponent(out Transitionable _)) continue;
+            if (!e.TryGetComponent(out AreaTransition _) &&
+                !e.TryGetComponent(out Transitionable _)) continue;
 
             if (e.TryGetComponent(out Render render))
             {
@@ -225,6 +230,26 @@ public class StateManager
 
     private static bool HasLootNearby(Vector2 playerPos, float radius)
     {
+        var areaInstance = GameHelper.Core.States.InGameStateObject.CurrentAreaInstance;
+        if (areaInstance == null) return false;
+
+        var awakeEntities = areaInstance.AwakeEntities;
+        float radiusSq = radius * radius;
+
+        foreach (var kvp in awakeEntities)
+        {
+            var e = kvp.Value;
+            if (!e.IsValid) continue;
+            if (!e.Path.StartsWith("Metadata/Items/")) continue;
+
+            if (e.TryGetComponent(out Render render))
+            {
+                float dx = render.GridPosition.X - playerPos.X;
+                float dy = render.GridPosition.Y - playerPos.Y;
+                if (dx * dx + dy * dy <= radiusSq)
+                    return true;
+            }
+        }
         return false;
     }
 

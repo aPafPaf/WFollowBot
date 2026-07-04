@@ -1,4 +1,6 @@
-﻿namespace WFollowBot.Data;
+﻿using System.Drawing;
+
+namespace WFollowBot.Data;
 
 public class StoragePath
 {

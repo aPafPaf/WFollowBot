@@ -35,7 +35,25 @@ namespace WFollowBot.Managers
                     break;
 
                 var entity = kvp.Value;
-                if (!entity.IsValid || entity.EntityState == EntityStates.Useless)
+                if (!entity.IsValid /*|| entity.EntityState == EntityStates.Useless*/)
+                    continue;
+
+                if (entity.EntityType is not EntityTypes.Monster)
+                    continue;
+
+                if (!entity.TryGetComponent(out Life life))
+                    continue;
+                if (life.Health.Current == 0)
+                    continue;
+
+                if (!entity.TryGetComponent(out Targetable targetable))
+                    continue;
+                //if (!targetable.IsTargetable)
+                //    continue;
+
+                if (!entity.TryGetComponent(out Positioned positioned))
+                    continue;
+                if (positioned.IsFriendly)
                     continue;
 
                 _grid.Add(entity);
@@ -48,6 +66,14 @@ namespace WFollowBot.Managers
         public void GetNearbyEntities(Vector2 gridPos, float radius, List<Entity> results)
         {
             _grid.GetEntitiesInRadius(gridPos, radius * radius, results);
+        }
+
+        public int GetNearbyEntitiesCount(Vector2 gridPos, float radius)
+        {
+            List<Entity> results = new List<Entity>();
+            _grid.GetEntitiesInRadius(gridPos, radius * radius, results);
+
+            return results.Count;
         }
 
         public List<Entity> GetEntitiesAroundPoint(Vector2 pos, float radius)

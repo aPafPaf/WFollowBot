@@ -1,5 +1,6 @@
 using Nefarius.ViGEm.Client.Targets.Xbox360;
 using System;
+using Newtonsoft.Json;
 using WFollowBot.Leader;
 
 namespace WFollowBot.Settings;
@@ -34,7 +35,7 @@ public class FollowerSettings
     public LeaderMode Mode = LeaderMode.Entity;
     public bool Enabled = false;
     public string SkillSetName = "Simple";
-    public float HoldRadius = 10f;
+    public float HoldRadius = 15f;
     public int ActionDelay = 75;
     public float RepathInterval = 0.5f;
     public float MaxStuckTime = 2.0f;
@@ -54,7 +55,12 @@ public class FollowerSettings
     public Xbox360Button AttackButton = Xbox360Button.RightShoulder;
 
     public bool FlaskUseEnabled = false;
-    public int FlaskHpThreshold = 50;
+    public bool EsFlaskUseEnabled = false;
+    public bool SpamFlaskUseEnabled = false;
+    [JsonProperty("FlashHpThreshold")]
+    public int FlaskHpThreshold = 90;
+    [JsonProperty("FlashManaThreshold")]
     public int FlaskManaThreshold = 30;
-    public int FlaskCooldownMs = 3000;
+    [JsonProperty("FlashCooldownMs")]
+    public int FlaskCooldownMs = 1000;
 }

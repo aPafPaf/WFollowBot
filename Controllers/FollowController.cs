@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using GameHelper.Extensions;
 using WFollowBot.Managers;
 
 namespace WFollowBot.Controllers;

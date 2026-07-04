@@ -1,9 +1,9 @@
+using System;
+using System.Numerics;
 using GameHelper;
 using GameHelper.RemoteObjects.Components;
 using GameOffsets.Objects.States.InGameState;
 using ImGuiNET;
-using System;
-using System.Numerics;
 
 namespace WFollowBot;
 

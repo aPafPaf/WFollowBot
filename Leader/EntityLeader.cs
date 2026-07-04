@@ -1,8 +1,8 @@
+using System;
+using System.Drawing;
 using GameHelper.Extensions;
 using GameHelper.RemoteObjects.Components;
 using GameHelper.RemoteObjects.States.InGameStateObjects;
-using System;
-using System.Drawing;
 
 namespace WFollowBot.Leader;
 

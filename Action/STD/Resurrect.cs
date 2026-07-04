@@ -1,4 +1,5 @@
-﻿using WFollowBot.Managers;
+﻿using Nefarius.ViGEm.Client.Targets.Xbox360;
+using WFollowBot.Managers;
 
 namespace WFollowBot.Action.STD;
 

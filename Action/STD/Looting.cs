@@ -1,11 +1,12 @@
-﻿using GameHelper.RemoteEnums;
-using GameHelper.RemoteObjects.Components;
-using GameHelper.RemoteObjects.States.InGameStateObjects;
-using Nefarius.ViGEm.Client.Targets.Xbox360;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
+using GameHelper.RemoteEnums;
+using GameHelper.RemoteEnums.Entity;
+using GameHelper.RemoteObjects.Components;
+using GameHelper.RemoteObjects.States.InGameStateObjects;
+using Nefarius.ViGEm.Client.Targets.Xbox360;
 using WFollowBot.Managers;
 using WFollowBot.Settings;
 
@@ -63,11 +64,10 @@ public class Looting : IAction
         float dist = (float)Math.Sqrt(closestDistSq);
         if (dist < 5f)
         {
-            context.JoyStick.PressButton(Xbox360Button.A, true);
+            context.JoyStick.PressButtonFor(Xbox360Button.A, 0.15f, 0.30f, "Looting");
         }
         else
         {
-            context.JoyStick.PressButton(Xbox360Button.A, false);
             var targetPoint = GetEntityPoint(nearestLoot);
             context.MovementController.MoveToward(playerPos, targetPoint, targetPoint);
         }

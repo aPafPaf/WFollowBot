@@ -1,4 +1,5 @@
-﻿using GameHelper.RemoteObjects.Components;
+﻿using GameHelper.Extensions;
+using GameHelper.RemoteObjects.Components;
 using GameHelper.RemoteObjects.States.InGameStateObjects;
 using System.Drawing;
 

@@ -65,7 +65,12 @@ public class PlayerContext
         CheckAreaChange();
         UpdateLeader();
         PlayerInfo.Update();
-        Pathfinding.PrevPosition = PlayerInfo.PlayerGridPosition;
+
+        if (Pathfinding.PrevPosition != PlayerInfo.PlayerGridPosition && 
+            RegenManager.IsValidPoint(TerrainInfo.ProcessedTerrainData, PlayerInfo.PlayerGridPosition))
+        {
+            Pathfinding.PrevPosition = PlayerInfo.PlayerGridPosition;
+        }
     }
 
     private void CheckAreaChange()
@@ -101,7 +106,11 @@ public class PlayerContext
 
         Pathfinding.Update();
 
-        StateManager.Update(Pathfinding, PlayerInfo, Leader, FollowController, _cachedSettings);
+        //TODO: Refactor -> Storage Update
+        StateManager.Update(
+            Pathfinding, PlayerInfo, Leader,
+            FollowController, _cachedSettings,
+            EntityGridManager, ActionProvider, this);
 
         if (StateManager.HasStateChanged)
             JoyStick.Reset();
