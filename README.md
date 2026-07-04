@@ -28,6 +28,15 @@ Bindings are defined in `Settings/KeyboardLayout.cs` and are not editable via th
 - **Nefarius.ViGEm.Client** — Xbox 360 controller emulation library
 - **ViGEmBus** — kernel driver, required for operation
 
+## Known issues
+
+- **Followers run in opposite directions** — try swapping Player 1 and Player 2
+- **Followers don't always click portals/transitions** — no joystick targeting data available
+- **Followers lose the path when you're near the edge of the terrain**
+- **Joystick direction display is inverted** (up/down swapped in the overlay)
+
+And plenty more — but the project is abandoned.
+
 ## Status
 
 Project abandoned due to the end of the Path of Exile 2 league.
