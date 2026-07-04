@@ -4,5 +4,6 @@
 
 /WFollowBot.sln
 /.vs/WFollowBot
-/obj
+obj/
 /.vs/ProjectEvaluation
+bin/
